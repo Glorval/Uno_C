@@ -4,7 +4,7 @@
 #include <malloc.h>
 #include <string.h>
 #include <time.h>
-#define DECKLENGTH 76//108 normal, 76 numbers only
+#define DECKLENGTH 76//108 normal, 76 numbers only, 100 no wilds
 #define NUMBERDEALT 7
 #define SHUFFLETHOROUGHNESS 5000
 #define MAXNUMBEROFPLAYERS 5
@@ -21,15 +21,19 @@ struct cardData {//Holds the data of each card
 typedef struct cardData card;
 
 
+
+
 void dataShifter(card input, card *writeto);//Easy way of slapping the data from one card entry into another
 void shuffle(card deck[DECKLENGTH]);//Shuffles the current deck
 void printDeck(card deck[DECKLENGTH]);//Prints the deck, debug feature
 void print(card deck);//Prints the card (Less typing in code lol)
 void detailedPrint(card deck);//Prints the card readibly, will print Colour then Number, or just Wild or Wild Pluf Four
+void clearscreen();//'Clears' the screen
 int isThisLegal(card inputCard, card cardInPlay);//Returns 1 if it is a legal play, 0 if not. Plus fours will, for now, be counted as legal always.
 int checkAgainstHand(card playerInput, card playerHand[DECKLENGTH]);//Returns 1 if its in their hand, 0 if not
 void removeCardFromHand(card CardToBeRemoved, card Hand[DECKLENGTH], card* HandPassalong);//Removes the designated card from the designated hand
 int updateCurrentPlayer(int currentPlayer, int direction, int playerCount);//Returns the new current player value
+int drawCard(card deck[DECKLENGTH], card* PlayerDrawEntry, card* PlayerFirstEntry, int currentTopdeck);//Easier way to draw a card than having the code block over and over again
 card aiV1(card Hand[DECKLENGTH], card Deck[DECKLENGTH], card cardInPlay);//First version of AI, capable of a pure numbers game
 
 
@@ -74,7 +78,7 @@ void main() {
 		printf("\n\n\n\n");//Ask the player and store how many AIs they want
 		printf("How many other players would you like? Max 4, min 1		");
 		scanf("%d", &playerCount);
-
+		clearscreen();
 		//dealing cards to everyone
 		for (int dealtCards = 0; dealtCards < NUMBERDEALT; dealtCards++) {
 			for (int currentPlayer = 0; currentPlayer <= playerCount + 1; currentPlayer++) {//Playercount + 1 to account for the user themselves
@@ -128,6 +132,9 @@ void main() {
 	//game loop
 	int currentPlayer = 0;//Keeps track of the current player
 	int direction = 1;//Keeps track of which direction and whether to increase or decrease the current player at the end of each players turn, 1 is normal -1 is antinormal.
+	int drawTwod = 0;
+	int skipped = 0;
+	int reversed = 0;
 	while (gameRunning == 1) {
 		//Player always goes first
 
@@ -135,99 +142,133 @@ void main() {
 		
 		if (currentPlayer == 0) {//Its the players turn
 
+			if (skipped == 1) {//Did we get skipped?
+				clearscreen();
+				printf("You were skipped\n");
+				currentPlayer = updateCurrentPlayer(currentPlayer, direction, playerCount);\
+				skipped = 0;
+			}else if (drawTwod == 1) {//Did we get plus 2?
+				clearscreen();
+				printf("You were plus two'd\n");
+				currentTopdeck = drawCard(deck, &PlayerZero[PlayerZero[0].cardCount], &PlayerZero[0], currentTopdeck);
+				currentTopdeck = drawCard(deck, &PlayerZero[PlayerZero[0].cardCount], &PlayerZero[0], currentTopdeck);
+				currentPlayer = updateCurrentPlayer(currentPlayer, direction, playerCount);
+				drawTwod = 0;
+			}else{//Normal Turn
 
-			printf("It is your turn, you have %d cards, and the current card in play is ", PlayerZero[0].cardCount);
-			detailedPrint(cardInPlay);
-			printf("\n\n");
-
-
-
-
-
-			//DISPLAY OTHER PLAYERS CARD COUNT
-			switch (playerCount) {//Check to see how many players there are so we can print the right amount of players hands
-			case (0):
-				printf("Error in play count?");//Shouldnt be zero players
-				printf("Data corruption noticed when hitting: Case Zero in switch statement for printing the number of cards the other players have");
-				dataCorruption = 1;
-				break;
-			case(1)://One AI
-				printf("AI One has %d cards", PlayerOne[0].cardCount);
-				break;
-			case(2)://Two AI
-				printf("AI One has %d cards", PlayerOne[0].cardCount);
-				printf(", AI Two has %d cards", PlayerTwo[0].cardCount);
-				break;
-			case(3)://Three AI
-				printf("AI One has %d cards", PlayerOne[0].cardCount);
-				printf(", AI Two has %d cards", PlayerTwo[0].cardCount);
-				printf(", AI Three has %d cards", PlayerThree[0].cardCount);
-				break;
-			case(4)://Four AI
-				printf("AI One has %d cards", PlayerOne[0].cardCount);
-				printf(", AI Two has %d cards", PlayerTwo[0].cardCount);
-				printf(", AI Three has %d cards", PlayerThree[0].cardCount);
-				printf(", AI Four has %d cards", PlayerFour[0].cardCount);
-				break;
-			default://Somehow a number that isnt listed
-				printf("Data corruption noticed when hitting: Default in Switch statement for printing the number of cards the other players have");
-				dataCorruption = 1;
-				break;
-			}
-			printf("\n\n");
-			//END OF DISPLAYING OTHER PLAYERS CARD COUNT
+				
+				printf("It is your turn, you have %d cards, and the current card in play is ", PlayerZero[0].cardCount);
+				detailedPrint(cardInPlay);
+				printf("\n\n");
 
 
 
 
 
-			printf("Your hand:\n");//Printing the players entire hand out nicely
-			for (int currentCard = 0; currentCard < PlayerZero[0].cardCount; currentCard++) {
-				detailedPrint(PlayerZero[currentCard]);
-				printf(", ");
-			}
-			printf("\n\n");
-
-
-
-			int legalPlay = 0;
-			int legalishPlay = 0;
-			card PlayerInput;
-			while (legalPlay == 0 || legalishPlay == 0) {//So that if a player puts in an illegal play it just resets
-				printf("What card would you like to play?\n");
-				scanf("%c", &PlayerInput.data[0]);//Takes out the trash
-				scanf("%c", &PlayerInput.data[0]);
-				scanf("%c", &PlayerInput.data[1]);
-				if (PlayerInput.data[0] == 'D') {//The player wishes to draw a card
-					dataShifter(deck[currentTopdeck], &PlayerZero[PlayerZero[0].cardCount]);//Copy the data from the current top of the deck into the next empty space in the players hand
-					currentTopdeck++;//Keep track of the top of the deck
-					PlayerZero[0].cardCount++;//Keep track of the players hand size
-					break;//Leave the while loop here because we just drew, we dont get to play now under these rules
+				//DISPLAY OTHER PLAYERS CARD COUNT
+				switch (playerCount) {//Check to see how many players there are so we can print the right amount of players hands
+				case (0):
+					printf("Error in play count?");//Shouldnt be zero players
+					printf("Data corruption noticed when hitting: Case Zero in switch statement for printing the number of cards the other players have");
+					dataCorruption = 1;
+					break;
+				case(1)://One AI
+					printf("AI One has %d cards", PlayerOne[0].cardCount);
+					break;
+				case(2)://Two AI
+					printf("AI One has %d cards", PlayerOne[0].cardCount);
+					printf(", AI Two has %d cards", PlayerTwo[0].cardCount);
+					break;
+				case(3)://Three AI
+					printf("AI One has %d cards", PlayerOne[0].cardCount);
+					printf(", AI Two has %d cards", PlayerTwo[0].cardCount);
+					printf(", AI Three has %d cards", PlayerThree[0].cardCount);
+					break;
+				case(4)://Four AI
+					printf("AI One has %d cards", PlayerOne[0].cardCount);
+					printf(", AI Two has %d cards", PlayerTwo[0].cardCount);
+					printf(", AI Three has %d cards", PlayerThree[0].cardCount);
+					printf(", AI Four has %d cards", PlayerFour[0].cardCount);
+					break;
+				default://Somehow a number that isnt listed
+					printf("Data corruption noticed when hitting: Default in Switch statement for printing the number of cards the other players have");
+					dataCorruption = 1;
+					break;
 				}
-				else {
-					if (isThisLegal(PlayerInput, cardInPlay) == 1) {//Check if it matches the card in play
-						legalishPlay = 1;//It matches the card on the top of the pile, but we don't know yet if its in the players hand
+				printf("\n\n");
+				//END OF DISPLAYING OTHER PLAYERS CARD COUNT
+
+
+
+
+
+				printf("Your hand:\n");//Printing the players entire hand out nicely
+				for (int currentCard = 0; currentCard < PlayerZero[0].cardCount; currentCard++) {
+					detailedPrint(PlayerZero[currentCard]);
+					printf(", ");
+				}
+				printf("\n\n");
+
+
+
+				int legalPlay = 0;
+				int legalishPlay = 0;
+				card PlayerInput;
+				while (legalPlay == 0 || legalishPlay == 0) {//So that if a player puts in an illegal play it just resets
+					printf("What card would you like to play?\n");
+					scanf("%c", &PlayerInput.data[0]);//Takes out the trash
+					scanf("%c", &PlayerInput.data[0]);
+					scanf("%c", &PlayerInput.data[1]);
+					printf("\n\n\n\n\n\n\n\n\n\n\n\n\n");
+					if (PlayerInput.data[0] == 'D') {//The player wishes to draw a card
+						currentTopdeck = drawCard(deck, &PlayerZero[PlayerZero[0].cardCount], &PlayerZero[0], currentTopdeck);
+						printf("You drew and are up to %i cards\n", PlayerZero[0].cardCount);
+						//legacy
+						//dataShifter(deck[currentTopdeck], &PlayerZero[PlayerZero[0].cardCount]);//Copy the data from the current top of the deck into the next empty space in the players hand
+						//currentTopdeck++;//Keep track of the top of the deck
+						//PlayerZero[0].cardCount++;//Keep track of the players hand size
+						break;//Leave the while loop here because we just drew, we dont get to play now under these rules
 					}
-					else {//Doesnt match so illegal play, this while loop will loop
-						printf("\nDoesn't match card in play\n");
-					}
-					if (checkAgainstHand(PlayerInput, PlayerZero) == 1) {
-						legalPlay = 1;//Its in their hand so this part is a legal play
-					}
-					else {//Doesnt match a card in their hand so illegal play, this while loop will loop
-						printf("\nIsn't a card in your hand\n");
+					else {
+						if (isThisLegal(PlayerInput, cardInPlay) == 1) {//Check if it matches the card in play
+							legalishPlay = 1;//It matches the card on the top of the pile, but we don't know yet if its in the players hand
+						}
+						else {//Doesnt match so illegal play, this while loop will loop
+							printf("\nDoesn't match card in play\n");
+						}
+						if (checkAgainstHand(PlayerInput, PlayerZero) == 1) {
+							legalPlay = 1;//Its in their hand so this part is a legal play
+							
+							printf("You played ");
+							detailedPrint(PlayerInput);
+							printf(" on a ");
+							detailedPrint(cardInPlay);
+							printf("\n\n");
+						}
+						else {//Doesnt match a card in their hand so illegal play, this while loop will loop
+							printf("\nIsn't a card in your hand\n");
+						}
 					}
 				}
-			}
-			if (legalPlay == 1 && legalishPlay == 1) {//If its a legal play, do below, otherwise the player has drawn a card and we move on.
-				//Now we have a player input that is a legal play and from their hand
-				dataShifter(PlayerInput, &cardInPlay);
-				removeCardFromHand(PlayerInput, PlayerZero, &PlayerZero);
-				PlayerZero[0].cardCount--;//Make sure to keep track of the players cards
+				if (legalPlay == 1 && legalishPlay == 1) {//If its a legal play, do below, otherwise the player has drawn a card and we move on.
+					//Now we have a player input that is a legal play and from their hand
+					if(PlayerInput.data[0] == 'S') skipped = 1;		//Did we play a skip	
+					if(PlayerInput.data[0] == 'R') direction = direction * -1;//Did we reverse
+					if(PlayerInput.data[0] == 'T') drawTwod = 1;//Did we play a draw two
+					dataShifter(PlayerInput, &cardInPlay);
+					removeCardFromHand(PlayerInput, PlayerZero, &PlayerZero);
+					PlayerZero[0].cardCount--;//Make sure to keep track of the players cards
+				}
+
+				
+				
+				currentPlayer = updateCurrentPlayer(currentPlayer, direction, playerCount);//End of normal turn
+
+
 			}
 
 
-			currentPlayer = updateCurrentPlayer(currentPlayer, direction, playerCount);
+
 
 		}//End of the players turn
 
@@ -239,116 +280,194 @@ void main() {
 
 		if (currentPlayer == 1) {//AI One's turn
 
+			if (skipped == 1) {//Did we get skipped?
+				currentPlayer = updateCurrentPlayer(currentPlayer, direction, playerCount);
+				skipped = 0;
+			}
+			else if (drawTwod == 1) {//Did we get plus 2?
+				currentTopdeck = drawCard(deck, &PlayerOne[PlayerOne[0].cardCount], &PlayerOne[0], currentTopdeck);
+				currentTopdeck = drawCard(deck, &PlayerOne[PlayerOne[0].cardCount], &PlayerOne[0], currentTopdeck);
+				currentPlayer = updateCurrentPlayer(currentPlayer, direction, playerCount);
+				drawTwod = 0;
+			}else {
+				//if (playerCount >= 1) {//Legacy
+					card AIPlay = aiV1(PlayerOne, deck, cardInPlay);
+					if (AIPlay.returnLegalCheck != 1) {//AI can play a card
+						printf("AI One played ");
+						detailedPrint(AIPlay);
+						printf(" on a ");
+						detailedPrint(cardInPlay);
+						printf("\n");
+						dataShifter(AIPlay, &cardInPlay);
+						removeCardFromHand(AIPlay, PlayerOne, &PlayerOne);
+						PlayerOne[0].cardCount--;
 
-			//if (playerCount >= 1) {//Legacy
-				card AIPlay = aiV1(PlayerOne, deck, cardInPlay);
-				if (AIPlay.returnLegalCheck != 1) {//AI can play a card
-					printf("AI One played ");
-					detailedPrint(AIPlay);
-					printf(" on a ");
-					detailedPrint(cardInPlay);
-					printf("\n");
-					dataShifter(AIPlay, &cardInPlay);
-					removeCardFromHand(AIPlay, PlayerOne, &PlayerOne);
-					PlayerOne[0].cardCount--;
-				}
-				else {//AI can NOT play a card and has to draw
-					dataShifter(deck[currentTopdeck], &PlayerOne[PlayerOne[0].cardCount]);//Copy the data from the current top of the deck into the next empty space in the players hand
-					currentTopdeck++;//Keep track of the top of the deck
-					PlayerOne[0].cardCount++;//Keep track of the players hand size
-					printf("AI One draws and it now has %i cards\n", PlayerOne[0].cardCount);
-				}
-			//}
-			printf("\n\n\n");
+						if (AIPlay.data[0] == 'S') skipped = 1;		//Did we play a skip	
+						if (AIPlay.data[0] == 'R') direction = direction * -1;//Did we reverse
+						if (AIPlay.data[0] == 'T') drawTwod = 1;//Did we play a draw two
 
-			currentPlayer = updateCurrentPlayer(currentPlayer, direction, playerCount);
+					}
+					else {//AI can NOT play a card and has to draw
+						dataShifter(deck[currentTopdeck], &PlayerOne[PlayerOne[0].cardCount]);//Copy the data from the current top of the deck into the next empty space in the players hand
+						currentTopdeck++;//Keep track of the top of the deck
+						PlayerOne[0].cardCount++;//Keep track of the players hand size
+						printf("AI One draws and it now has %i cards\n", PlayerOne[0].cardCount);
+					}
+				//}
+				printf("\n");
+
+				currentPlayer = updateCurrentPlayer(currentPlayer, direction, playerCount);
+
+
+			}
+
+
+
+
 
 		}//End of AI one's turn
 
 
 		if (currentPlayer == 2) {//Player two's turn
 
+			if (skipped == 1) {//Did we get skipped?
+				currentPlayer = updateCurrentPlayer(currentPlayer, direction, playerCount);
+				skipped = 0;
+			}else if (drawTwod == 1) {//Did we get plus 2?
+				currentTopdeck = drawCard(deck, &PlayerTwo[PlayerTwo[0].cardCount], &PlayerTwo[0], currentTopdeck);
+				currentTopdeck = drawCard(deck, &PlayerTwo[PlayerTwo[0].cardCount], &PlayerTwo[0], currentTopdeck);
+				currentPlayer = updateCurrentPlayer(currentPlayer, direction, playerCount);
+				drawTwod = 0;
+			}else {
+				//if (playerCount >= 2) {//Legacy
+					card AIPlay = aiV1(PlayerTwo, deck, cardInPlay);
+					if (AIPlay.returnLegalCheck != 1) {//AI can play a card
+						printf("AI Two played ");
+						detailedPrint(AIPlay);
+						printf(" on a ");
+						detailedPrint(cardInPlay);
+						printf("\n");
+						dataShifter(AIPlay, &cardInPlay);
+						removeCardFromHand(AIPlay, PlayerTwo, &PlayerTwo);
+						PlayerTwo[0].cardCount--;
 
-			//if (playerCount >= 2) {//Legacy
-				card AIPlay = aiV1(PlayerTwo, deck, cardInPlay);
-				if (AIPlay.returnLegalCheck != 1) {//AI can play a card
-					printf("AI Two played ");
-					detailedPrint(AIPlay);
-					printf(" on a ");
-					detailedPrint(cardInPlay);
-					printf("\n");
-					dataShifter(AIPlay, &cardInPlay);
-					removeCardFromHand(AIPlay, PlayerTwo, &PlayerTwo);
-					PlayerTwo[0].cardCount--;
-				}
-				else {//AI can NOT play a card and has to draw
-					dataShifter(deck[currentTopdeck], &PlayerTwo[PlayerTwo[0].cardCount]);//Copy the data from the current top of the deck into the next empty space in the players hand
-					currentTopdeck++;//Keep track of the top of the deck
-					PlayerTwo[0].cardCount++;//Keep track of the players hand size
-					printf("AI Two draws and it now has %i cards\n", PlayerTwo[0].cardCount);
-				}
-			//}
-			printf("\n\n\n");
+						if (AIPlay.data[0] == 'S') skipped = 1;		//Did we play a skip	
+						if (AIPlay.data[0] == 'R') direction = direction * -1;//Did we reverse
+						if (AIPlay.data[0] == 'T') drawTwod = 1;//Did we play a draw two
 
-			currentPlayer = updateCurrentPlayer(currentPlayer, direction, playerCount);
+					}
+					else {//AI can NOT play a card and has to draw
+						dataShifter(deck[currentTopdeck], &PlayerTwo[PlayerTwo[0].cardCount]);//Copy the data from the current top of the deck into the next empty space in the players hand
+						currentTopdeck++;//Keep track of the top of the deck
+						PlayerTwo[0].cardCount++;//Keep track of the players hand size
+						printf("AI Two draws and it now has %i cards\n", PlayerTwo[0].cardCount);
+					}
+				//}
+				printf("\n");
+
+				currentPlayer = updateCurrentPlayer(currentPlayer, direction, playerCount);
+
+
+
+			}
+
+
 
 		}//End of AI two's turn
+
 
 
 		if (currentPlayer == 3) {//AI three's turn
 
 
-			//if (playerCount >= 3) {//Legacy
-				card AIPlay = aiV1(PlayerThree, deck, cardInPlay);
-				if (AIPlay.returnLegalCheck != 1) {//AI can play a card
-					printf("AI Three played ");
-					detailedPrint(AIPlay);
-					printf(" on a ");
-					detailedPrint(cardInPlay);
-					printf("\n");
-					dataShifter(AIPlay, &cardInPlay);
-					removeCardFromHand(AIPlay, PlayerThree, &PlayerThree);
-					PlayerThree[0].cardCount--;
-				}
-				else {//AI can NOT play a card and has to draw
-					dataShifter(deck[currentTopdeck], &PlayerThree[PlayerThree[0].cardCount]);//Copy the data from the current top of the deck into the next empty space in the players hand
-					currentTopdeck++;//Keep track of the top of the deck
-					PlayerThree[0].cardCount++;//Keep track of the players hand size
-					printf("AI Three draws and it now has %i cards\n", PlayerThree[0].cardCount);
-				}
-			//}
-			printf("\n\n\n");
+			if (skipped == 1) {//Did we get skipped?
+				currentPlayer = updateCurrentPlayer(currentPlayer, direction, playerCount);
+				skipped = 0;
+			}else if (drawTwod == 1) {//Did we get plus 2?
+				currentTopdeck = drawCard(deck, &PlayerThree[PlayerThree[0].cardCount], &PlayerThree[0], currentTopdeck);
+				currentTopdeck = drawCard(deck, &PlayerThree[PlayerThree[0].cardCount], &PlayerThree[0], currentTopdeck);
+				currentPlayer = updateCurrentPlayer(currentPlayer, direction, playerCount);
+				drawTwod = 0;
+			}else {
+				//if (playerCount >= 3) {//Legacy
+					card AIPlay = aiV1(PlayerThree, deck, cardInPlay);
+					if (AIPlay.returnLegalCheck != 1) {//AI can play a card
+						printf("AI Three played ");
+						detailedPrint(AIPlay);
+						printf(" on a ");
+						detailedPrint(cardInPlay);
+						printf("\n");
+						dataShifter(AIPlay, &cardInPlay);
+						removeCardFromHand(AIPlay, PlayerThree, &PlayerThree);
+						PlayerThree[0].cardCount--;
 
-			currentPlayer = updateCurrentPlayer(currentPlayer, direction, playerCount);
+						if (AIPlay.data[0] == 'S') skipped = 1;		//Did we play a skip	
+						if (AIPlay.data[0] == 'R') direction = direction * -1;//Did we reverse
+						if (AIPlay.data[0] == 'T') drawTwod = 1;//Did we play a draw two
+
+					}
+					else {//AI can NOT play a card and has to draw
+						dataShifter(deck[currentTopdeck], &PlayerThree[PlayerThree[0].cardCount]);//Copy the data from the current top of the deck into the next empty space in the players hand
+						currentTopdeck++;//Keep track of the top of the deck
+						PlayerThree[0].cardCount++;//Keep track of the players hand size
+						printf("AI Three draws and it now has %i cards\n", PlayerThree[0].cardCount);
+					}
+				//}
+				printf("\n");
+
+				currentPlayer = updateCurrentPlayer(currentPlayer, direction, playerCount);
+
+
+			}
+
+
 
 		}//End of ai threes turn
 		
 
 		if (currentPlayer == 4) {//AI fours turn
 
+			if (skipped == 1) {//Did we get skipped?
+				currentPlayer = updateCurrentPlayer(currentPlayer, direction, playerCount);
+				skipped = 0;
+			}else if (drawTwod == 1) {//Did we get plus 2?
+				currentTopdeck = drawCard(deck, &PlayerFour[PlayerFour[0].cardCount], &PlayerFour[0], currentTopdeck);
+				currentTopdeck = drawCard(deck, &PlayerFour[PlayerFour[0].cardCount], &PlayerFour[0], currentTopdeck);
+				currentPlayer = updateCurrentPlayer(currentPlayer, direction, playerCount);
+				drawTwod = 0;
+			}else {
+				//if (playerCount >= 4) {//Legacy
+					card AIPlay = aiV1(PlayerFour, deck, cardInPlay);
+					if (AIPlay.returnLegalCheck != 1) {//AI can play a card
+						printf("AI Four played ");
+						detailedPrint(AIPlay);
+						printf(" on a ");
+						detailedPrint(cardInPlay);
+						printf("\n");
+						dataShifter(AIPlay, &cardInPlay);
+						removeCardFromHand(AIPlay, PlayerFour, &PlayerFour);
+						PlayerFour[0].cardCount--;
 
-			//if (playerCount >= 4) {//Legacy
-				card AIPlay = aiV1(PlayerFour, deck, cardInPlay);
-				if (AIPlay.returnLegalCheck != 1) {//AI can play a card
-					printf("AI Four played ");
-					detailedPrint(AIPlay);
-					printf(" on a ");
-					detailedPrint(cardInPlay);
-					printf("\n");
-					dataShifter(AIPlay, &cardInPlay);
-					removeCardFromHand(AIPlay, PlayerFour, &PlayerFour);
-					PlayerFour[0].cardCount--;
-				}
-				else {//AI can NOT play a card and has to draw
-					dataShifter(deck[currentTopdeck], &PlayerFour[PlayerFour[0].cardCount]);//Copy the data from the current top of the deck into the next empty space in the players hand
-					currentTopdeck++;//Keep track of the top of the deck
-					PlayerFour[0].cardCount++;//Keep track of the players hand size
-					printf("AI Two draws and it now has %i cards\n", PlayerFour[0].cardCount);
-				}
-			//}
-			printf("\n\n\n");
+						if (AIPlay.data[0] == 'S') skipped = 1;		//Did we play a skip	
+						if (AIPlay.data[0] == 'R') direction = direction * -1;//Did we reverse
+						if (AIPlay.data[0] == 'T') drawTwod = 1;//Did we play a draw two
 
-			currentPlayer = updateCurrentPlayer(currentPlayer, direction, playerCount);
+					}
+					else {//AI can NOT play a card and has to draw
+						dataShifter(deck[currentTopdeck], &PlayerFour[PlayerFour[0].cardCount]);//Copy the data from the current top of the deck into the next empty space in the players hand
+						currentTopdeck++;//Keep track of the top of the deck
+						PlayerFour[0].cardCount++;//Keep track of the players hand size
+						printf("AI Two draws and it now has %i cards\n", PlayerFour[0].cardCount);
+					}
+				//}
+				printf("\n");
+
+				currentPlayer = updateCurrentPlayer(currentPlayer, direction, playerCount);
+
+
+			}
+
+
 
 		}//End of ai fours turn
 
@@ -598,6 +717,11 @@ void printDeck(card deck[DECKLENGTH]) {//debug feature to print deck
 }
 
 
+//'Clears' the screen
+void clearscreen() {
+	printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+}
+
 //Easy way of slapping the data from one card entry into another
 void dataShifter(card input, card *writeto){//Easy way of slapping the data from one card entry into another
 	writeto->data[0] = input.data[0];
@@ -690,6 +814,21 @@ int updateCurrentPlayer(int currentPlayer, int direction, int playerCount) {
 		return(currentPlayer);//go back a player
 	}
 }
+
+
+//Easier way to draw a card than having the code block over and over again
+int drawCard(card deck[DECKLENGTH], card* PlayerDrawEntry, card* PlayerFirstEntry, int currentTopdeck) {
+	PlayerDrawEntry->data[0] = deck[currentTopdeck].data[0];
+	PlayerDrawEntry->data[1] = deck[currentTopdeck].data[1];
+	PlayerFirstEntry->cardCount++;
+	currentTopdeck++;
+	return(currentTopdeck);
+}
+
+
+
+
+
 
 //It's bigger, it's better! Ladies and gentlemen its /too much/ for Mr. Incredible! It's finally ready!
 card aiV1(card Hand[DECKLENGTH], card Deck[DECKLENGTH], card cardInPlay) {
