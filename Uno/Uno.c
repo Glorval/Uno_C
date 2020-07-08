@@ -7,24 +7,24 @@
 #define DECKLENGTH 100//108 normal, 76 numbers only, 100 no wilds
 #define NUMBERDEALT 7
 #define SHUFFLETHOROUGHNESS 5000
-#define MAXNUMBEROFPLAYERS 5
+#define MAXNUMBEROFPLAYERS 4//Specifically, max number of AIs
 
 
 int dataCorruption = 0;//Global flag for marking if there has been data corruption.
 int currentTopdeck = 0;
 
 struct cardData {//Holds the data of each card
-	char data[2];//2 Wide because it needs 2 slots to hold the data of each card and 108 cause number in deck
+	char data[2];//Holds the data of a single card
 	int cardCount;//Used for players
-	int returnLegalCheck;//Used for if the AI can make a legal play or not
+	int returnLegalCheck;//Used for if the AI can make a legal play or not//MADE OBSOLETE IN AI VERSION 1.2
 	int drawing;//Used in 1.2 AI to tell the main if the AI needs to draw.
 };
 typedef struct cardData card;
 
 struct aiCluster {//Holds all the AI's
-	card PlayerOne[DECKLENGTH], PlayerTwo[DECKLENGTH], PlayerThree[DECKLENGTH], PlayerFour[DECKLENGTH];
+	card Player[DECKLENGTH];
 };
-typedef struct aiCluster AI;
+typedef struct aiCluster ai;
 
 FILE* debugDump;
 
@@ -41,8 +41,8 @@ void removeCardFromHand(card CardToBeRemoved, card Hand[DECKLENGTH], card* HandP
 int updateCurrentPlayer(int currentPlayer, int direction, int playerCount);//Returns the new current player value
 int drawCard(card deck[DECKLENGTH], card* PlayerDrawEntry, card* PlayerFirstEntry, int currentTopdeck);//Easier way to draw a card than having the code block over and over again
 void intToPrint(int input, int capitalized);//Takes the input int and prints it.
-card aiV1(card Hand[DECKLENGTH], card Deck[DECKLENGTH], card cardInPlay);//First version of AI, capable of a pure numbers game
-card aiV1_2(card Hand[DECKLENGTH], card cardInPlay, int currentPlayer, int direction);
+card aiV1(card Hand[DECKLENGTH], card Deck[DECKLENGTH], card cardInPlay);//First version of AI, capable of a pure numbers game//Ended capable of numbers/specials, no wilds
+card aiV1_2(card Hand[DECKLENGTH], card cardInPlay, int currentPlayer, int direction);//Version 1.2 of AI, capable of full game with no prediction or proper thought.
 
 
 void main() {
@@ -58,7 +58,9 @@ void main() {
 	card cardInPlay;//The current card in play
 	cardInPlay.data[0] = 'E';
 	cardInPlay.data[1] = 'E';
-	card PlayerZero[DECKLENGTH], PlayerOne[DECKLENGTH], PlayerTwo[DECKLENGTH], PlayerThree[DECKLENGTH], PlayerFour[DECKLENGTH];
+	card PlayerZero[DECKLENGTH];//, PlayerOne[DECKLENGTH], PlayerTwo[DECKLENGTH], PlayerThree[DECKLENGTH], PlayerFour[DECKLENGTH];
+	ai AI[MAXNUMBEROFPLAYERS + 1];//Just ignore AI[0]...
+
 
 	//_________________________________________
 	//PRE GAME SETUP
@@ -96,23 +98,23 @@ void main() {
 						currentTopdeck++;//Increment because card has been drawn from deck to a players hand
 						break;
 					case 1:
-						PlayerOne[dealtCards].data[0] = deck[currentTopdeck].data[0];//All the rest are the same
-						PlayerOne[dealtCards].data[1] = deck[currentTopdeck].data[1];
+						AI[1].Player[dealtCards].data[0] = deck[currentTopdeck].data[0];//All the rest are the same
+						AI[1].Player[dealtCards].data[1] = deck[currentTopdeck].data[1];
 						currentTopdeck++;
 						break;
 					case 2:
-						PlayerTwo[dealtCards].data[0] = deck[currentTopdeck].data[0];
-						PlayerTwo[dealtCards].data[1] = deck[currentTopdeck].data[1];
+						AI[2].Player[dealtCards].data[0] = deck[currentTopdeck].data[0];
+						AI[2].Player[dealtCards].data[1] = deck[currentTopdeck].data[1];
 						currentTopdeck++;
 						break;
 					case 3:
-						PlayerThree[dealtCards].data[0] = deck[currentTopdeck].data[0];
-						PlayerThree[dealtCards].data[1] = deck[currentTopdeck].data[1];
+						AI[3].Player[dealtCards].data[0] = deck[currentTopdeck].data[0];
+						AI[3].Player[dealtCards].data[1] = deck[currentTopdeck].data[1];
 						currentTopdeck++;
 						break;
 					case 4:
-						PlayerFour[dealtCards].data[0] = deck[currentTopdeck].data[0];
-						PlayerFour[dealtCards].data[1] = deck[currentTopdeck].data[1];
+						AI[4].Player[dealtCards].data[0] = deck[currentTopdeck].data[0];
+						AI[4].Player[dealtCards].data[1] = deck[currentTopdeck].data[1];
 						currentTopdeck++;
 						break;
 				}
@@ -121,10 +123,10 @@ void main() {
 
 		//Setting the card count of each player, even if they arent in the game it doesnt matter if they are set to 7
 		PlayerZero[0].cardCount = 7;
-		PlayerOne[0].cardCount = 7;
-		PlayerTwo[0].cardCount = 7;
-		PlayerThree[0].cardCount = 7;
-		PlayerFour[0].cardCount = 7;
+		AI[1].Player[0].cardCount = 7;
+		AI[2].Player[0].cardCount = 7;
+		AI[3].Player[0].cardCount = 7;
+		AI[4].Player[0].cardCount = 7;
 
 		
 		dataShifter(deck[currentTopdeck], &cardInPlay);//Stores the next card as the card in play, thus kicking off the game
@@ -185,7 +187,7 @@ void main() {
 			}else{//Normal Turn
 
 				
-				printf("It is your turn, you have %d cards, and the current card in play is ", PlayerZero[0].cardCount);
+				printf("\nIt is your turn, you have %d cards, and the current card in play is ", PlayerZero[0].cardCount);
 				detailedPrint(cardInPlay);
 				printf("\n\n");
 
@@ -200,22 +202,22 @@ void main() {
 					dataCorruption = 1;
 					break;
 				case(1)://One AI
-					printf("AI One has %d cards", PlayerOne[0].cardCount);
+					printf("AI One has %d cards", AI[1].Player[0].cardCount);
 					break;
 				case(2)://Two AI
-					printf("AI One has %d cards", PlayerOne[0].cardCount);
-					printf(", AI Two has %d cards", PlayerTwo[0].cardCount);
+					printf("AI One has %d cards", AI[1].Player[0].cardCount);
+					printf(", AI Two has %d cards", AI[2].Player[0].cardCount);
 					break;
 				case(3)://Three AI
-					printf("AI One has %d cards", PlayerOne[0].cardCount);
-					printf(", AI Two has %d cards", PlayerTwo[0].cardCount);
-					printf(", AI Three has %d cards", PlayerThree[0].cardCount);
+					printf("AI One has %d cards", AI[1].Player[0].cardCount);
+					printf(", AI Two has %d cards", AI[2].Player[0].cardCount);
+					printf(", AI Three has %d cards", AI[3].Player[0].cardCount);
 					break;
 				case(4)://Four AI
-					printf("AI One has %d cards", PlayerOne[0].cardCount);
-					printf(", AI Two has %d cards", PlayerTwo[0].cardCount);
-					printf(", AI Three has %d cards", PlayerThree[0].cardCount);
-					printf(", AI Four has %d cards", PlayerFour[0].cardCount);
+					printf("AI One has %d cards", AI[1].Player[0].cardCount);
+					printf(", AI Two has %d cards", AI[2].Player[0].cardCount);
+					printf(", AI Three has %d cards", AI[3].Player[0].cardCount);
+					printf(", AI Four has %d cards", AI[4].Player[0].cardCount);
 					break;
 				default://Somehow a number that isnt listed
 					printf("Data corruption noticed when hitting: Default in Switch statement for printing the number of cards the other players have");
@@ -250,7 +252,7 @@ void main() {
 					if (PlayerInput.data[0] == 'D') {//The player wishes to draw a card
 						currentTopdeck = drawCard(deck, &PlayerZero[PlayerZero[0].cardCount], &PlayerZero[0], currentTopdeck);
 						printf("You drew and are up to %i cards\n\n", PlayerZero[0].cardCount);
-						//legacy
+						//legacy //I really should write what made these obsolete
 						//dataShifter(deck[currentTopdeck], &PlayerZero[PlayerZero[0].cardCount]);//Copy the data from the current top of the deck into the next empty space in the players hand
 						//currentTopdeck++;//Keep track of the top of the deck
 						//PlayerZero[0].cardCount++;//Keep track of the players hand size
@@ -315,276 +317,76 @@ void main() {
 
 		}//End of the players turn
 
+		//AI BLOCK
+		//It has to be someones turn now, just either did the players turn or its not their turn yet, so it now HAS to be SOME ai's turn.
 
-
-
-
-
-
-		if (currentPlayer == 1) {//AI One's turn
-
-			fprintf(debugDump, "AI One's turn, direction %d\n", direction);//DEBUG RECORDING
-
-			if (skipped == 1) {//Did we get skipped?
-				fprintf(debugDump, "AI One was skipped.\n");//DEBUG RECORDING
-				currentPlayer = updateCurrentPlayer(currentPlayer, direction, playerCount);
-				printf("AI One got skipped.\n\n");
+			//AI
+		if (gameRunning == 1) {//Both in case the player wins and to get the rest of the code out one
+			if (skipped == 1) {
+				printf("AI ");
+				intToPrint(currentPlayer, 1);
+				printf(" was Skipped.\n");
+				fprintf(debugDump, "AI %d was skipped.\n", currentPlayer);
 				skipped = 0;
-
-			}
-			else if (drawTwod == 1) {//Did we get plus 2?
-				fprintf(debugDump, "AI One was +2d.\n");//DEBUG RECORDING
-				printf("AI One got Plus Two'd.\n\n");
-				currentTopdeck = drawCard(deck, &PlayerOne[PlayerOne[0].cardCount], &PlayerOne[0], currentTopdeck);
-				currentTopdeck = drawCard(deck, &PlayerOne[PlayerOne[0].cardCount], &PlayerOne[0], currentTopdeck);
 				currentPlayer = updateCurrentPlayer(currentPlayer, direction, playerCount);
+			}
+			else if (drawTwod == 1) {
+				printf("AI ");
+				intToPrint(currentPlayer, 1);
+				printf(" was Plus Twoed.\n");
+				fprintf(debugDump, "AI %d was +2d.\n", currentPlayer);
 				drawTwod = 0;
+				currentTopdeck = drawCard(deck, &AI[currentPlayer].Player[AI[currentPlayer].Player[0].cardCount], &AI[currentPlayer].Player[0], currentTopdeck);
+				currentTopdeck = drawCard(deck, &AI[currentPlayer].Player[AI[currentPlayer].Player[0].cardCount], &AI[currentPlayer].Player[0], currentTopdeck);
+				currentPlayer = updateCurrentPlayer(currentPlayer, direction, playerCount);
+			}
+			else if (drawFourd == 1) {
+				printf("AI ");
+				intToPrint(currentPlayer, 1);
+				printf(" was Plus Foured.\n");
+				fprintf(debugDump, "AI %d was +4d.\n", currentPlayer);
+				drawFourd = 0;
+				for (int counter = 0; counter < 4; counter++) {
+					currentTopdeck = drawCard(deck, &AI[currentPlayer].Player[AI[currentPlayer].Player[0].cardCount], &AI[currentPlayer].Player[0], currentTopdeck);
+				}
+				currentPlayer = updateCurrentPlayer(currentPlayer, direction, playerCount);
+			}
+			else {
+				card AIPlay = aiV1_2(AI[currentPlayer].Player, cardInPlay, currentPlayer, direction);
+				if (AIPlay.data[0] != 'D') {
+					if (AIPlay.data[0] == 'S') skipped = 1;		//Did we play a skip	
+					if (AIPlay.data[0] == 'R') direction = direction * -1;//Did we reverse
+					if (AIPlay.data[0] == 'T') drawTwod = 1;//Did we play a draw two
+					AI[currentPlayer].Player[0].cardCount--;
+					dataShifter(AIPlay, &cardInPlay);
+				}
+				else {
+					dataShifter(deck[currentTopdeck], &AI[currentPlayer].Player[AI[currentPlayer].Player[0].cardCount]);//Copy the data from the current top of the deck into the next empty space in the players hand
+					currentTopdeck++;//Keep track of the top of the deck
+					AI[currentPlayer].Player[0].cardCount++;//Keep track of the players hand size
+					printf("AI ");
+					intToPrint(currentPlayer, 1);
+					printf(" drew and is now up to %d cards.\n", AI[currentPlayer].Player[0].cardCount);
+				}
 
-			}else {
-				//if (playerCount >= 1) {//Legacy
-					card AIPlay = aiV1(PlayerOne, deck, cardInPlay);
-					if (AIPlay.returnLegalCheck != 1) {//AI can play a card
-						printf("AI One played ");
-						detailedPrint(AIPlay);
-						printf(" on a ");
-						detailedPrint(cardInPlay);
-						printf("\n");
-						dataShifter(AIPlay, &cardInPlay);
-						removeCardFromHand(AIPlay, PlayerOne, &PlayerOne);
-						PlayerOne[0].cardCount--;
-
-						if (AIPlay.data[0] == 'S') skipped = 1;		//Did we play a skip	
-						if (AIPlay.data[0] == 'R') direction = direction * -1;//Did we reverse
-						if (AIPlay.data[0] == 'T') drawTwod = 1;//Did we play a draw two
-
-					}
-					else {//AI can NOT play a card and has to draw
-						dataShifter(deck[currentTopdeck], &PlayerOne[PlayerOne[0].cardCount]);//Copy the data from the current top of the deck into the next empty space in the players hand
-						currentTopdeck++;//Keep track of the top of the deck
-						PlayerOne[0].cardCount++;//Keep track of the players hand size
-						printf("AI One draws and it now has %i cards\n", PlayerOne[0].cardCount);
-					}
-				//}
-				printf("\n");
-
-				if (PlayerOne[0].cardCount == 0) {//End of the game check
+				if (AI[currentPlayer].Player[0].cardCount == 0) {//End of the game check
 					clearscreen();
-					printf("AI One has won the game!\n");
+					printf("AI ");
+					intToPrint(currentPlayer, 1);
+					printf(" has won the game!\n");
 					gameRunning = 0;
 					currentPlayer = -1;
 				}
 				else {
 					currentPlayer = updateCurrentPlayer(currentPlayer, direction, playerCount);//End of normal turn
-					fprintf(debugDump, "Normal turn, played %c%c. Direction: %d, new turn %d\n", AIPlay.data[0], AIPlay.data[1], direction, currentPlayer);//DEBUG RECORDING
 				}
-
 			}
 
 
+		}
 
+		//END OF AI BLOCK
 
-
-		}//End of AI one's turn
-
-
-		if (currentPlayer == 2) {//Player two's turn
-
-
-			fprintf(debugDump, "AI Twos's turn, direction %d\n", direction);//DEBUG RECORDING
-
-			if (skipped == 1) {//Did we get skipped?
-				fprintf(debugDump, "AI Two was skipped.\n");//DEBUG RECORDING
-				printf("AI Two got skipped.\n\n");
-				currentPlayer = updateCurrentPlayer(currentPlayer, direction, playerCount);
-				skipped = 0;
-
-
-			}else if (drawTwod == 1) {//Did we get plus 2?
-				fprintf(debugDump, "AI Two was +2d.\n");//DEBUG RECORDING
-				printf("AI Two got Plus Two'd.\n\n");
-				currentTopdeck = drawCard(deck, &PlayerTwo[PlayerTwo[0].cardCount], &PlayerTwo[0], currentTopdeck);
-				currentTopdeck = drawCard(deck, &PlayerTwo[PlayerTwo[0].cardCount], &PlayerTwo[0], currentTopdeck);
-				currentPlayer = updateCurrentPlayer(currentPlayer, direction, playerCount);
-				drawTwod = 0;
-
-
-			}else {
-				//if (playerCount >= 2) {//Legacy
-					card AIPlay = aiV1(PlayerTwo, deck, cardInPlay);
-					if (AIPlay.returnLegalCheck != 1) {//AI can play a card
-						printf("AI Two played ");
-						detailedPrint(AIPlay);
-						printf(" on a ");
-						detailedPrint(cardInPlay);
-						printf("\n");
-						dataShifter(AIPlay, &cardInPlay);
-						removeCardFromHand(AIPlay, PlayerTwo, &PlayerTwo);
-						PlayerTwo[0].cardCount--;
-
-						if (AIPlay.data[0] == 'S') skipped = 1;		//Did we play a skip	
-						if (AIPlay.data[0] == 'R') direction = direction * -1;//Did we reverse
-						if (AIPlay.data[0] == 'T') drawTwod = 1;//Did we play a draw two
-
-					}
-					else {//AI can NOT play a card and has to draw
-						dataShifter(deck[currentTopdeck], &PlayerTwo[PlayerTwo[0].cardCount]);//Copy the data from the current top of the deck into the next empty space in the players hand
-						currentTopdeck++;//Keep track of the top of the deck
-						PlayerTwo[0].cardCount++;//Keep track of the players hand size
-						printf("AI Two draws and it now has %i cards\n", PlayerTwo[0].cardCount);
-					}
-				//}
-
-				printf("\n");
-
-
-				if (PlayerTwo[0].cardCount == 0) {//End of the game check
-					clearscreen();
-					printf("AI Two has won the game!\n");
-					gameRunning = 0;
-					currentPlayer = -1;
-				}
-				else {
-					currentPlayer = updateCurrentPlayer(currentPlayer, direction, playerCount);//End of normal turn
-					fprintf(debugDump, "Normal turn, played %c%c. Direction: %d, new turn %d\n", AIPlay.data[0], AIPlay.data[1], direction, currentPlayer);//DEBUG RECORDING
-				}
-
-
-			}
-
-
-
-		}//End of AI two's turn
-
-
-
-		if (currentPlayer == 3) {//AI three's turn
-
-			fprintf(debugDump, "AI Three's turn, direction %d\n", direction);//DEBUG RECORDING
-
-			if (skipped == 1) {//Did we get skipped?		SKIPPED
-				fprintf(debugDump, "AI Two was skipped.\n");//DEBUG RECORDING
-				printf("AI Three got skipped.\n\n");
-				currentPlayer = updateCurrentPlayer(currentPlayer, direction, playerCount);
-				skipped = 0;
-
-			}else if (drawTwod == 1) {//Did we get plus 2?		PLUS TWOD
-				fprintf(debugDump, "AI Three was +2d.\n");//DEBUG RECORDING
-				printf("AI Three got Plus Two'd.\n\n");
-				currentTopdeck = drawCard(deck, &PlayerThree[PlayerThree[0].cardCount], &PlayerThree[0], currentTopdeck);
-				currentTopdeck = drawCard(deck, &PlayerThree[PlayerThree[0].cardCount], &PlayerThree[0], currentTopdeck);
-				currentPlayer = updateCurrentPlayer(currentPlayer, direction, playerCount);
-				drawTwod = 0;
-
-			}else {
-				//if (playerCount >= 3) {//Legacy
-					card AIPlay = aiV1(PlayerThree, deck, cardInPlay);//GET AI PLAY
-					if (AIPlay.returnLegalCheck != 1) {//AI can play a card
-						printf("AI Three played ");
-						detailedPrint(AIPlay);
-						printf(" on a ");
-						detailedPrint(cardInPlay);
-						printf("\n");
-						dataShifter(AIPlay, &cardInPlay);
-						removeCardFromHand(AIPlay, PlayerThree, &PlayerThree);
-						PlayerThree[0].cardCount--;
-
-						if (AIPlay.data[0] == 'S') skipped = 1;		//Did we play a skip	
-						if (AIPlay.data[0] == 'R') direction = direction * -1;//Did we reverse
-						if (AIPlay.data[0] == 'T') drawTwod = 1;//Did we play a draw two
-
-					}
-					else {//AI can NOT play a card and has to draw
-						dataShifter(deck[currentTopdeck], &PlayerThree[PlayerThree[0].cardCount]);//Copy the data from the current top of the deck into the next empty space in the players hand
-						currentTopdeck++;//Keep track of the top of the deck
-						PlayerThree[0].cardCount++;//Keep track of the players hand size
-						printf("AI Three draws and it now has %i cards\n", PlayerThree[0].cardCount);
-					}
-				//}
-				printf("\n");
-
-				if (PlayerThree[0].cardCount == 0) {//End of the game check
-					clearscreen();
-					printf("AI Three has won the game!\n");
-					gameRunning = 0;
-					currentPlayer = -1;
-				}
-				else {//NORMAL END OF TURN
-					currentPlayer = updateCurrentPlayer(currentPlayer, direction, playerCount);//End of normal turn
-					fprintf(debugDump, "Normal turn, played %c%c. Direction: %d, new turn %d\n", AIPlay.data[0], AIPlay.data[1], direction, currentPlayer);//DEBUG RECORDING
-				}
-
-			}
-
-
-
-		}//End of ai threes turn
-		
-
-	
-		
-
-
-		//if (currentPlayer == 4) {//AI fours turn
-
-		//	fprintf(debugDump, "AI Fours's turn, direction %d\n", direction);//DEBUG RECORDING
-
-		//	if (skipped == 1) {//Did we get skipped?
-		//		fprintf(debugDump, "AI Four was skipped.\n");//DEBUG RECORDING
-		//		printf("AI Four got skipped.\n\n");
-		//		currentPlayer = updateCurrentPlayer(currentPlayer, direction, playerCount);
-		//		skipped = 0;
-
-		//	}else if (drawTwod == 1) {//Did we get plus 2?
-		//		fprintf(debugDump, "AI Four was +2d.\n");//DEBUG RECORDING
-		//		printf("AI Four got Plus Two'd.\n\n");
-		//		currentTopdeck = drawCard(deck, &PlayerFour[PlayerFour[0].cardCount], &PlayerFour[0], currentTopdeck);
-		//		currentTopdeck = drawCard(deck, &PlayerFour[PlayerFour[0].cardCount], &PlayerFour[0], currentTopdeck);
-		//		currentPlayer = updateCurrentPlayer(currentPlayer, direction, playerCount);
-		//		drawTwod = 0;
-
-		//	}else {
-		//		//if (playerCount >= 4) {//Legacy
-		//			card AIPlay = aiV1(PlayerFour, deck, cardInPlay);
-		//			if (AIPlay.returnLegalCheck != 1) {//AI can play a card
-		//				printf("AI Four played ");
-		//				detailedPrint(AIPlay);
-		//				printf(" on a ");
-		//				detailedPrint(cardInPlay);
-		//				printf("\n");
-		//				dataShifter(AIPlay, &cardInPlay);
-		//				removeCardFromHand(AIPlay, PlayerFour, &PlayerFour);
-		//				PlayerFour[0].cardCount--;
-
-		//				if (AIPlay.data[0] == 'S') skipped = 1;		//Did we play a skip	
-		//				if (AIPlay.data[0] == 'R') direction = direction * -1;//Did we reverse
-		//				if (AIPlay.data[0] == 'T') drawTwod = 1;//Did we play a draw two
-
-		//			}
-		//			else {//AI can NOT play a card and has to draw
-		//				dataShifter(deck[currentTopdeck], &PlayerFour[PlayerFour[0].cardCount]);//Copy the data from the current top of the deck into the next empty space in the players hand
-		//				currentTopdeck++;//Keep track of the top of the deck
-		//				PlayerFour[0].cardCount++;//Keep track of the players hand size
-		//				printf("AI Four draws and it now has %i cards\n", PlayerFour[0].cardCount);
-		//			}
-		//		//}
-		//		printf("\n");
-
-		//		if (PlayerFour[0].cardCount == 0) {//End of the game check
-		//			clearscreen();
-		//			printf("AI Four has won the game!\n");
-		//			gameRunning = 0;
-		//			currentPlayer = -1;
-		//		}
-		//		else {
-		//			currentPlayer = updateCurrentPlayer(currentPlayer, direction, playerCount);//End of normal turn
-		//			fprintf(debugDump, "Normal turn, played %c%c. Direction: %d, new turn %d\n", AIPlay.data[0], AIPlay.data[1], direction, currentPlayer);//DEBUG RECORDING
-		//		}
-
-		//	}
-
-
-
-		//}//End of ai fours turn
 
 		
 
@@ -801,26 +603,26 @@ int drawCard(card deck[DECKLENGTH], card* PlayerDrawEntry, card* PlayerFirstEntr
 
 //Takes the input int and prints it.
 void intToPrint(int input, int capitalized) {
-	if (capitalized == 1) {
+	if (capitalized == 0) {
 		if (input == 0) {
 			printf("zero");
 		}else if (input == 1) {
 			printf("one");
-		}else if (input == 1) {
+		}else if (input == 2) {
 			printf("two");
-		}else if (input == 1) {
+		}else if (input == 3) {
 			printf("three");
-		}else if (input == 1) {
+		}else if (input == 4) {
 			printf("four");
-		}else if (input == 1) {
+		}else if (input == 5) {
 			printf("five");
-		}else if (input == 1) {
+		}else if (input == 6) {
 			printf("six");
-		}else if (input == 1) {
+		}else if (input == 7) {
 			printf("seven");
-		}else if (input == 1) {
+		}else if (input == 8) {
 			printf("eight");
-		}else if (input == 1) {
+		}else if (input == 9) {
 			printf("nine");
 		}
 	}
@@ -829,21 +631,21 @@ void intToPrint(int input, int capitalized) {
 			printf("Zero");
 		}else if (input == 1) {
 			printf("One");
-		}else if (input == 1) {
+		}else if (input == 2) {
 			printf("Two");
-		}else if (input == 1) {
+		}else if (input == 3) {
 			printf("Three");
-		}else if (input == 1) {
+		}else if (input == 4) {
 			printf("Four");
-		}else if (input == 1) {
+		}else if (input == 5) {
 			printf("Five");
-		}else if (input == 1) {
+		}else if (input == 6) {
 			printf("Six");
-		}else if (input == 1) {
+		}else if (input == 7) {
 			printf("Seven");
-		}else if (input == 1) {
+		}else if (input == 8) {
 			printf("Eight");
-		}else if (input == 1) {
+		}else if (input == 9) {
 			printf("Nine");
 		}
 	}
@@ -868,10 +670,73 @@ card aiV1(card Hand[DECKLENGTH], card Deck[DECKLENGTH], card cardInPlay) {
 	return(NotLegal);
 }
 
+//Code required in main function for AIv1
+//if (currentPlayer == 4) {//AI fours turn
+//
+//	fprintf(debugDump, "AI Fours's turn, direction %d\n", direction);//DEBUG RECORDING
+//
+//	if (skipped == 1) {//Did we get skipped?
+//		fprintf(debugDump, "AI Four was skipped.\n");//DEBUG RECORDING
+//		printf("AI Four got skipped.\n\n");
+//		currentPlayer = updateCurrentPlayer(currentPlayer, direction, playerCount);
+//		skipped = 0;
+//
+//	}else if (drawTwod == 1) {//Did we get plus 2?
+//		fprintf(debugDump, "AI Four was +2d.\n");//DEBUG RECORDING
+//		printf("AI Four got Plus Two'd.\n\n");
+//		currentTopdeck = drawCard(deck, &PlayerFour[PlayerFour[0].cardCount], &PlayerFour[0], currentTopdeck);
+//		currentTopdeck = drawCard(deck, &PlayerFour[PlayerFour[0].cardCount], &PlayerFour[0], currentTopdeck);
+//		currentPlayer = updateCurrentPlayer(currentPlayer, direction, playerCount);
+//		drawTwod = 0;
+//
+//	}else {
+//		//if (playerCount >= 4) {//Legacy
+//			card AIPlay = aiV1(PlayerFour, deck, cardInPlay);
+//			if (AIPlay.returnLegalCheck != 1) {//AI can play a card
+//				printf("AI Four played ");
+//				detailedPrint(AIPlay);
+//				printf(" on a ");
+//				detailedPrint(cardInPlay);
+//				printf("\n");
+//				dataShifter(AIPlay, &cardInPlay);
+//				removeCardFromHand(AIPlay, PlayerFour, &PlayerFour);
+//				PlayerFour[0].cardCount--;
+//
+//				if (AIPlay.data[0] == 'S') skipped = 1;		//Did we play a skip	
+//				if (AIPlay.data[0] == 'R') direction = direction * -1;//Did we reverse
+//				if (AIPlay.data[0] == 'T') drawTwod = 1;//Did we play a draw two
+//
+//			}
+//			else {//AI can NOT play a card and has to draw
+//				dataShifter(deck[currentTopdeck], &PlayerFour[PlayerFour[0].cardCount]);//Copy the data from the current top of the deck into the next empty space in the players hand
+//				currentTopdeck++;//Keep track of the top of the deck
+//				PlayerFour[0].cardCount++;//Keep track of the players hand size
+//				printf("AI Four draws and it now has %i cards\n", PlayerFour[0].cardCount);
+//			}
+//		//}
+//		printf("\n");
+//
+//		if (PlayerFour[0].cardCount == 0) {//End of the game check
+//			clearscreen();
+//			printf("AI Four has won the game!\n");
+//			gameRunning = 0;
+//			currentPlayer = -1;
+//		}
+//		else {
+//			currentPlayer = updateCurrentPlayer(currentPlayer, direction, playerCount);//End of normal turn
+//			fprintf(debugDump, "Normal turn, played %c%c. Direction: %d, new turn %d\n", AIPlay.data[0], AIPlay.data[1], direction, currentPlayer);//DEBUG RECORDING
+//		}
+//
+//	}
+//}//End of ai fours turn
 
 
+
+
+
+//It can support wilds, supports the new data format and contains more of the AI logic within it than V1.
 card aiV1_2(card Hand[DECKLENGTH], card cardInPlay, int currentPlayer, int direction) {
-	fprintf(debugDump, "AI %d turn, direction %d\n", direction, currentPlayer);//DEBUG RECORDING
+	fprintf(debugDump, "AI %d turn, direction %d\n", currentPlayer, direction);//DEBUG RECORDING
 	card AIPlay;
 	int legalPlay = 0;
 	int currentCard = 0;
@@ -888,49 +753,16 @@ card aiV1_2(card Hand[DECKLENGTH], card cardInPlay, int currentPlayer, int direc
 	if (legalPlay == 1) {
 		printf("AI ");//Print to user what AI just played what on what! /I thought I needed laughter but it has to come from me/ /If you want laughter then stick with Cheese/
 		intToPrint(currentPlayer, 1);
-		printf("played a ");
+		printf(" played a ");
 		detailedPrint(AIPlay);
 		printf(" on a ");
 		detailedPrint(cardInPlay);
 		printf("\n");
 		return(AIPlay);
 	}
+	else {
+		AIPlay.data[0] = 'D';
+		return(AIPlay);
+	}
 
 }
-	
-	if (AIPlay.returnLegalCheck != 1) {//AI can play a card
-		printf("AI Two played ");
-		detailedPrint(AIPlay);
-		printf(" on a ");
-		detailedPrint(cardInPlay);
-		printf("\n");
-		dataShifter(AIPlay, &cardInPlay);
-		removeCardFromHand(AIPlay, PlayerTwo, &PlayerTwo);
-		PlayerTwo[0].cardCount--;
-
-		if (AIPlay.data[0] == 'S') skipped = 1;		//Did we play a skip	
-		if (AIPlay.data[0] == 'R') direction = direction * -1;//Did we reverse
-		if (AIPlay.data[0] == 'T') drawTwod = 1;//Did we play a draw two
-
-	}
-	else {//AI can NOT play a card and has to draw
-		dataShifter(deck[currentTopdeck], &PlayerTwo[PlayerTwo[0].cardCount]);//Copy the data from the current top of the deck into the next empty space in the players hand
-		currentTopdeck++;//Keep track of the top of the deck
-		PlayerTwo[0].cardCount++;//Keep track of the players hand size
-		printf("AI Two draws and it now has %i cards\n", PlayerTwo[0].cardCount);
-	}
-	//}
-
-	printf("\n");
-
-
-	if (PlayerTwo[0].cardCount == 0) {//End of the game check
-		clearscreen();
-		printf("AI Two has won the game!\n");
-		gameRunning = 0;
-		currentPlayer = -1;
-	}
-	else {
-		currentPlayer = updateCurrentPlayer(currentPlayer, direction, playerCount);//End of normal turn
-		fprintf(debugDump, "Normal turn, played %c%c. Direction: %d, new turn %d\n", AIPlay.data[0], AIPlay.data[1], direction, currentPlayer);//DEBUG RECORDING
-	}
