@@ -1,23 +1,6 @@
 Start of Loop
 Player Zeros turn, direction 1
-Normal turn, played Ry. Direction: -1, new turn 4
-AI 4 turn, direction -1
-Start of Loop
-AI 3 turn, direction -1
-Start of Loop
-AI 2 turn, direction -1
-Start of Loop
-AI 1 turn, direction -1
-Start of Loop
-Player Zeros turn, direction -1
-Normal turn, played Tg. Direction: -1, new turn 4
-AI 4 was +2d.
-Start of Loop
-AI 3 turn, direction -1
-Start of Loop
-AI 4 turn, direction 1
-Start of Loop
-Player Zeros turn, direction 1
+Normal turn, played 2g. Direction: 1, new turn 1
 AI 1 turn, direction 1
 Start of Loop
 AI 2 turn, direction 1
@@ -27,3 +10,171 @@ Start of Loop
 AI 4 turn, direction 1
 Start of Loop
 Player Zeros turn, direction 1
+Normal turn, played DD. Direction: 1, new turn 1
+AI 1 turn, direction 1
+Start of Loop
+AI 2 turn, direction 1
+Start of Loop
+AI 3 was +2d.
+Start of Loop
+AI 4 turn, direction 1
+Start of Loop
+Player Zeros turn, direction 1
+Normal turn, played DD. Direction: 1, new turn 1
+AI 1 turn, direction 1
+Start of Loop
+AI 2 turn, direction 1
+Start of Loop
+AI 3 turn, direction 1
+Start of Loop
+AI 4 turn, direction 1
+Start of Loop
+Player Zeros turn, direction 1
+Normal turn, played DD. Direction: 1, new turn 1
+AI 1 turn, direction 1
+Start of Loop
+AI 2 turn, direction 1
+Start of Loop
+AI 3 turn, direction 1
+Start of Loop
+AI 4 turn, direction 1
+Start of Loop
+Player Zeros turn, direction 1
+Normal turn, played DD. Direction: 1, new turn 1
+AI 1 turn, direction 1
+Start of Loop
+AI 2 turn, direction 1
+Start of Loop
+AI 3 turn, direction 1
+Start of Loop
+AI 4 turn, direction 1
+Start of Loop
+Player Zeros turn, direction 1
+Normal turn, played DD. Direction: 1, new turn 1
+AI 1 turn, direction 1
+Start of Loop
+AI 2 turn, direction 1
+Start of Loop
+AI 3 was skipped.
+Start of Loop
+AI 4 turn, direction 1
+Start of Loop
+Player Zeros turn, direction 1
+Normal turn, played DD. Direction: 1, new turn 1
+AI 1 turn, direction 1
+Start of Loop
+AI 2 turn, direction 1
+Start of Loop
+AI 3 turn, direction 1
+Start of Loop
+AI 4 turn, direction 1
+Start of Loop
+Player Zeros turn, direction 1
+Player Zero was +2d.
+AI 1 turn, direction 1
+Start of Loop
+AI 2 turn, direction 1
+Start of Loop
+AI 3 turn, direction 1
+Start of Loop
+AI 4 turn, direction 1
+Start of Loop
+Player Zeros turn, direction 1
+Normal turn, played DD. Direction: 1, new turn 1
+AI 1 turn, direction 1
+Start of Loop
+AI 2 was skipped.
+Start of Loop
+AI 3 turn, direction 1
+Start of Loop
+AI 4 turn, direction 1
+Start of Loop
+Player Zeros turn, direction 1
+Normal turn, played DD. Direction: 1, new turn 1
+AI 1 turn, direction 1
+Start of Loop
+AI 2 turn, direction 1
+Start of Loop
+AI 1 turn, direction -1
+Start of Loop
+Player Zeros turn, direction -1
+Normal turn, played DD. Direction: -1, new turn 4
+AI 4 turn, direction -1
+Start of Loop
+AI 3 turn, direction -1
+Start of Loop
+AI 2 turn, direction -1
+Start of Loop
+AI 1 turn, direction -1
+Start of Loop
+Player Zeros turn, direction -1
+Normal turn, played DD. Direction: -1, new turn 4
+AI 4 turn, direction -1
+Start of Loop
+AI 3 turn, direction -1
+Start of Loop
+AI 2 turn, direction -1
+Start of Loop
+AI 1 turn, direction -1
+Start of Loop
+Player Zeros turn, direction -1
+Normal turn, played DD. Direction: -1, new turn 4
+AI 4 turn, direction -1
+Start of Loop
+AI 3 turn, direction -1
+Start of Loop
+AI 2 turn, direction -1
+Start of Loop
+AI 1 turn, direction -1
+Start of Loop
+Player Zeros turn, direction -1
+Normal turn, played DD. Direction: -1, new turn 4
+AI 4 turn, direction -1
+Start of Loop
+AI 3 turn, direction -1
+Start of Loop
+AI 2 turn, direction -1
+Start of Loop
+AI 1 turn, direction -1
+Start of Loop
+Player Zeros turn, direction -1
+Normal turn, played DD. Direction: -1, new turn 4
+AI 4 turn, direction -1
+Start of Loop
+AI 3 turn, direction -1
+Start of Loop
+AI 4 turn, direction 1
+Start of Loop
+AI 3 turn, direction -1
+Start of Loop
+AI 2 turn, direction -1
+Start of Loop
+AI 1 turn, direction -1
+Start of Loop
+Player Zeros turn, direction -1
+Normal turn, played DD. Direction: -1, new turn 4
+AI 4 turn, direction -1
+Start of Loop
+AI 3 turn, direction -1
+Start of Loop
+AI 2 turn, direction -1
+Start of Loop
+AI 1 turn, direction -1
+Start of Loop
+Player Zeros turn, direction -1
+Normal turn, played DD. Direction: -1, new turn 4
+AI 4 turn, direction -1
+Start of Loop
+AI 3 turn, direction -1
+Start of Loop
+AI 2 turn, direction -1
+Start of Loop
+AI 1 turn, direction -1
+Start of Loop
+Player Zeros turn, direction -1
+Normal turn, played Ww. Direction: -1, new turn 4
+AI 4 turn, direction -1
+Start of Loop
+AI 3 was +2d.
+Start of Loop
+AI 2 turn, direction -1
