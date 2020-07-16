@@ -1,0 +1,304 @@
+Start of Loop
+
+AI 1 turn.
+AI 1 turn, direction 1
+Normal turn, played Sg. Direction: 1, new turn 1
+
+Start of Loop
+
+AI 2 turn.
+AI 2 was skipped.
+Start of Loop
+
+AI 3 turn.
+AI 3 turn, direction 1
+Normal turn, played 5g. Direction: 1, new turn 3
+
+Start of Loop
+
+AI 4 turn.
+AI 4 turn, direction 1
+Normal turn, played 5r. Direction: 1, new turn 4
+
+Start of Loop
+
+AI 1 turn.
+AI 1 turn, direction 1
+Start of Loop
+
+AI 2 turn.
+AI 2 turn, direction 1
+Normal turn, played 8r. Direction: 1, new turn 2
+
+Start of Loop
+
+AI 3 turn.
+AI 3 turn, direction 1
+Normal turn, played 2r. Direction: 1, new turn 3
+
+Start of Loop
+
+AI 4 turn.
+AI 4 turn, direction 1
+Normal turn, played 4r. Direction: 1, new turn 4
+
+Start of Loop
+
+AI 1 turn.
+AI 1 turn, direction 1
+Normal turn, played 4b. Direction: 1, new turn 1
+
+Start of Loop
+
+AI 2 turn.
+AI 2 turn, direction 1
+Start of Loop
+
+AI 3 turn.
+AI 3 turn, direction 1
+Normal turn, played 8b. Direction: 1, new turn 3
+
+Start of Loop
+
+AI 4 turn.
+AI 4 turn, direction 1
+Normal turn, played Rb. Direction: -1, new turn 4
+
+Start of Loop
+
+AI 3 turn.
+AI 3 turn, direction -1
+Start of Loop
+
+AI 2 turn.
+AI 2 turn, direction -1
+Normal turn, played Ry. Direction: 1, new turn 2
+
+Start of Loop
+
+AI 3 turn.
+AI 3 turn, direction 1
+Normal turn, played Ty. Direction: 1, new turn 3
+
+Start of Loop
+
+AI 4 turn.
+AI 4 was +2d.
+Start of Loop
+
+AI 1 turn.
+AI 1 turn, direction 1
+Start of Loop
+
+AI 2 turn.
+AI 2 turn, direction 1
+Normal turn, played Tg. Direction: 1, new turn 2
+
+Start of Loop
+
+AI 3 turn.
+AI 3 was +2d.
+Start of Loop
+
+AI 4 turn.
+AI 4 turn, direction 1
+Normal turn, played 6g. Direction: 1, new turn 4
+
+Start of Loop
+
+AI 1 turn.
+AI 1 turn, direction 1
+Normal turn, played 3g. Direction: 1, new turn 1
+
+Start of Loop
+
+AI 2 turn.
+AI 2 turn, direction 1
+Normal turn, played 0g. Direction: 1, new turn 2
+
+Start of Loop
+
+AI 3 turn.
+AI 3 turn, direction 1
+Normal turn, played 5g. Direction: 1, new turn 3
+
+Start of Loop
+
+AI 4 turn.
+AI 4 turn, direction 1
+Start of Loop
+
+AI 1 turn.
+AI 1 turn, direction 1
+Normal turn, played 9g. Direction: 1, new turn 1
+
+Start of Loop
+
+AI 2 turn.
+AI 2 turn, direction 1
+Normal turn, played 1g. Direction: 1, new turn 2
+
+Start of Loop
+
+AI 3 turn.
+AI 3 turn, direction 1
+Start of Loop
+
+AI 4 turn.
+AI 4 turn, direction 1
+Normal turn, played Rg. Direction: -1, new turn 4
+
+Start of Loop
+
+AI 3 turn.
+AI 3 turn, direction -1
+Start of Loop
+
+AI 2 turn.
+AI 2 turn, direction -1
+Start of Loop
+
+AI 1 turn.
+AI 1 turn, direction -1
+Normal turn, played 8g. Direction: -1, new turn 1
+
+Start of Loop
+
+AI 4 turn.
+AI 4 turn, direction -1
+Start of Loop
+
+AI 3 turn.
+AI 3 turn, direction -1
+Start of Loop
+
+AI 2 turn.
+AI 2 turn, direction -1
+Start of Loop
+
+AI 1 turn.
+AI 1 turn, direction -1
+Normal turn, played Rg. Direction: 1, new turn 1
+
+Start of Loop
+
+AI 2 turn.
+AI 2 turn, direction 1
+Start of Loop
+
+AI 3 turn.
+AI 3 turn, direction 1
+Start of Loop
+
+AI 4 turn.
+AI 4 turn, direction 1
+Normal turn, played Ry. Direction: -1, new turn 4
+
+Start of Loop
+
+AI 3 turn.
+AI 3 turn, direction -1
+Normal turn, played 2y. Direction: -1, new turn 3
+
+Start of Loop
+
+AI 2 turn.
+AI 2 turn, direction -1
+Normal turn, played 2y. Direction: -1, new turn 2
+
+Start of Loop
+
+AI 1 turn.
+AI 1 turn, direction -1
+Start of Loop
+
+AI 4 turn.
+AI 4 turn, direction -1
+Normal turn, played 2r. Direction: -1, new turn 4
+
+Start of Loop
+
+AI 3 turn.
+AI 3 turn, direction -1
+Normal turn, played 7r. Direction: -1, new turn 3
+
+Start of Loop
+
+AI 2 turn.
+AI 2 turn, direction -1
+Normal turn, played 0r. Direction: -1, new turn 2
+
+Start of Loop
+
+AI 1 turn.
+AI 1 turn, direction -1
+Normal turn, played Wb. Direction: -1, new turn 1
+
+Start of Loop
+
+AI 4 turn.
+AI 4 turn, direction -1
+Normal turn, played 2b. Direction: -1, new turn 4
+
+Start of Loop
+
+AI 3 turn.
+AI 3 turn, direction -1
+Normal turn, played 6b. Direction: -1, new turn 3
+
+Start of Loop
+
+AI 2 turn.
+AI 2 turn, direction -1
+Normal turn, played 5b. Direction: -1, new turn 2
+
+Start of Loop
+
+AI 1 turn.
+AI 1 turn, direction -1
+Normal turn, played 7b. Direction: -1, new turn 1
+
+Start of Loop
+
+AI 4 turn.
+AI 4 turn, direction -1
+Normal turn, played 9b. Direction: -1, new turn 4
+
+Start of Loop
+
+AI 3 turn.
+AI 3 turn, direction -1
+Normal turn, played 3b. Direction: -1, new turn 3
+
+Start of Loop
+
+AI 2 turn.
+AI 2 turn, direction -1
+Normal turn, played 2b. Direction: -1, new turn 2
+
+Start of Loop
+
+AI 1 turn.
+AI 1 turn, direction -1
+Normal turn, played 6b. Direction: -1, new turn 1
+
+Start of Loop
+
+AI 4 turn.
+AI 4 turn, direction -1
+Normal turn, played Tb. Direction: -1, new turn 4
+
+Start of Loop
+
+AI 3 turn.
+AI 3 was +2d.
+Start of Loop
+
+AI 2 turn.
+AI 2 turn, direction -1
+Start of Loop
+
+AI 1 turn.
+AI 1 turn, direction -1
+Normal turn, played Wr. Direction: -1, new turn 1
+
