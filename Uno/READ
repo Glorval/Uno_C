@@ -1,0 +1,2 @@
+All deck files are there to switch between 'modes' but you would have to compile your own exe to get rid of say, wilds, because you need to change DECKLENGTH in the code when switching.
+All that is needed to play is the .exe and the deck.txt, dump gets created each time and is the record of the last game played.
